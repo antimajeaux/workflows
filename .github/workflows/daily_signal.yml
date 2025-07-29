@@ -1,0 +1,29 @@
+name: Daily Trade Signal
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 12 * * 1-5'
+
+jobs:
+  run-trade-signal:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install ccxt pandas numpy ta lightgbm optuna yfinance scikit-learn joblib matplotlib requests
+
+      - name: Run trade signal script
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python trade_signal.py
